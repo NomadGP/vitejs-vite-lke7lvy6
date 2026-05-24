@@ -1,259 +1,318 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "./supabase";
 
 export default function App(){
 
-const[email,setEmail]=useState("");
-const[password,setPassword]=useState("");
+const [user,setUser]=useState<any>(null);
 
-async function inscription(){
+const [email,setEmail]=useState("");
+const [password,setPassword]=useState("");
 
-const {error}=await supabase.auth.signUp({
+const [page,setPage]=useState("menu");
 
-email,
-password
+useEffect(()=>{
 
-});
+supabase.auth.getUser().then(({data})=>{
+setUser(data.user)
+})
 
-if(error){
+const {
+data:{subscription}
+}=supabase.auth.onAuthStateChange(
+(event,session)=>{
+setUser(session?.user||null)
+})
 
-alert(error.message);
-return;
+return()=>subscription.unsubscribe()
 
-}
-
-alert("Compte créé 🚀 Vérifie tes emails");
-
-}
+},[])
 
 async function connexion(){
 
 const {error}=await supabase.auth.signInWithPassword({
-
 email,
 password
-
-});
+})
 
 if(error){
-
-alert(error.message);
-return;
+alert(error.message)
+}
 
 }
 
-alert("Bienvenue pilote 🏁");
+async function inscription(){
+
+const {error}=await supabase.auth.signUp({
+email,
+password
+})
+
+if(error){
+alert(error.message)
+}else{
+alert("Compte créé")
+}
 
 }
 
+async function logout(){
 
-return(
-
-<div style={page}>
-
-<h1 style={titre}>
-◢◤ NOMAD GP ◢◤
-</h1>
-
-<div style={mini}>
-M I N I I I Z C A R
-</div>
-
-
-<div style={card}>
-
-<h2>
-
-Connexion Pilote
-
-</h2>
-
-
-<input
-
-style={input}
-
-placeholder="Email"
-
-value={email}
-
-onChange={(e)=>
-
-setEmail(
-e.target.value
-)
+await supabase.auth.signOut()
 
 }
-
-/>
-
-
-<input
-
-type="password"
-
-style={input}
-
-placeholder="Mot de passe"
-
-value={password}
-
-onChange={(e)=>
-
-setPassword(
-e.target.value
-)
-
-}
-
-/>
-
-
-<button
-
-style={btn}
-
-onClick={
-connexion
-}
-
->
-
-Connexion
-
-</button>
-
-
-<button
-
-style={btn2}
-
-onClick={
-inscription
-}
-
->
-
-Créer compte
-
-</button>
-
-
-<p style={{
-opacity:.6
-}}>
-
-Ta mère pourra créer son compte
-depuis chez elle plus tard 😄
-
-</p>
-
-</div>
-
-</div>
-
-)
-
-}
-
-
-const page={
-
-background:
-"linear-gradient(#000,#081421)",
-
-minHeight:"100vh",
-
-padding:30,
-
-color:"white",
-
-textAlign:"center"
-
-}
-
-
-const titre={
-
-fontSize:55,
-
-color:"orange",
-
-textShadow:
-"0 0 30px orange"
-
-}
-
-
-const mini={
-
-letterSpacing:8,
-
-color:"#00d9ff"
-
-}
-
-
-const card={
-
-maxWidth:500,
-
-margin:"40px auto",
-
-padding:30,
-
-background:"#07111f",
-
-border:
-"1px solid #00d9ff",
-
-borderRadius:25
-
-}
-
-
-const input={
-
-width:"100%",
-
-padding:15,
-
-marginBottom:15,
-
-background:"#111",
-
-color:"white"
-
-}
-
 
 const btn={
 
-padding:15,
-
 width:"100%",
-
-background:"#00d9ff",
-
+padding:"18px",
+marginBottom:15,
 border:"none",
+borderRadius:50,
+background:"#1cc7e8",
+cursor:"pointer",
+fontSize:18
+}
 
-borderRadius:20,
+const box={
 
-marginBottom:10
+maxWidth:650,
+margin:"auto",
+padding:25,
+background:"#03152c",
+border:"2px solid cyan",
+borderRadius:30,
+color:"white"
+}
+
+if(!user){
+
+return(
+
+<div style={{
+background:"#000814",
+minHeight:"100vh",
+padding:30,
+color:"white"
+}}>
+
+<h1
+style={{
+color:"orange",
+textAlign:"center"
+}}
+>
+NOMAD GP
+</h1>
+
+<div style={box}>
+
+<h2>Connexion pilote</h2>
+
+<input
+placeholder="email"
+value={email}
+onChange={(e)=>setEmail(e.target.value)}
+style={btn}
+/>
+
+<input
+type="password"
+placeholder="mot de passe"
+value={password}
+onChange={(e)=>setPassword(e.target.value)}
+style={btn}
+/>
+
+<button
+style={btn}
+onClick={connexion}
+>
+Connexion
+</button>
+
+<button
+style={{
+...btn,
+background:"orange"
+}}
+onClick={inscription}
+>
+Créer compte
+</button>
+
+</div>
+
+</div>
+
+)
 
 }
 
+return(
 
-const btn2={
+<div style={{
+background:"#000814",
+minHeight:"100vh",
+padding:30,
+color:"white"
+}}>
 
-padding:15,
+<h1
+style={{
+color:"orange",
+textAlign:"center"
+}}
+>
+NOMAD GP
+</h1>
 
-width:"100%",
+<div style={box}>
 
-background:"orange",
+{page==="menu"&&<>
 
-border:"none",
+<button style={btn} onClick={()=>setPage("profil")}>
+👤 Profil
+</button>
 
-borderRadius:20
+<button style={btn} onClick={()=>setPage("parties")}>
+🏆 Parties
+</button>
+
+<button style={btn} onClick={()=>setPage("jeux")}>
+🎮 Jeux
+</button>
+
+<button style={btn} onClick={()=>setPage("arts")}>
+🎨 Arts
+</button>
+
+<button style={btn} onClick={()=>setPage("batisseurs")}>
+🏗️ Bâtisseurs
+</button>
+
+<button
+style={{
+...btn,
+background:"#ff4444"
+}}
+onClick={logout}
+>
+Déconnexion
+</button>
+
+</>}
+
+{page==="profil"&&<>
+
+<h2>👤 Mon profil</h2>
+
+<p>Email : {user.email}</p>
+
+<p>Nom pilote officiel</p>
+
+<input
+style={btn}
+placeholder="Jean-Sèb"
+/>
+
+<p>Nom pilote éphémère</p>
+
+<input
+style={btn}
+placeholder="Pseudo secondaire"
+/>
+
+<p>Photo profil</p>
+
+<input
+type="file"
+/>
+
+<p>Compteur points : 0</p>
+
+<button
+style={btn}
+onClick={()=>setPage("menu")}
+>
+Retour
+</button>
+
+</>}
+
+{page==="parties"&&<>
+
+<h2>🏆 Historique</h2>
+
+<p>Aucune partie pour le moment</p>
+
+<button
+style={btn}
+onClick={()=>setPage("menu")}
+>
+Retour
+</button>
+
+</>}
+
+{page==="jeux"&&<>
+
+<h2>🎮 Jeux Nomad GP</h2>
+
+<ul>
+
+<li>?????</li>
+<li>?????</li>
+<li>?????</li>
+
+</ul>
+
+<button
+style={btn}
+onClick={()=>setPage("menu")}
+>
+Retour
+</button>
+
+</>}
+
+{page==="arts"&&<>
+
+<h2>🎨 Arts Miniiizcar</h2>
+
+<p>Musique : ❤️</p>
+<p>Graffiti : ?</p>
+<p>Montage vidéo : ON</p>
+
+<button
+style={btn}
+onClick={()=>setPage("menu")}
+>
+Retour
+</button>
+
+</>}
+
+{page==="batisseurs"&&<>
+
+<h2>🏗️ Bâtisseurs</h2>
+
+<p>Contact équipe Nomad GP</p>
+
+<p>info.nomadgp@gmail.com</p>
+
+<button
+style={btn}
+onClick={()=>setPage("menu")}
+>
+Retour
+</button>
+
+</>}
+
+</div>
+
+</div>
+
+)
 
 }
