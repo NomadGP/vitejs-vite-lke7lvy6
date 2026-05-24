@@ -1,315 +1,500 @@
-import { useEffect, useState } from "react";
-import { supabase } from "./supabase";
+import { useState } from "react";
 
 export default function App(){
 
-const [user,setUser]=useState<any>(null);
+const [page,setPage]=useState("menu")
 
-const [email,setEmail]=useState("");
-const [password,setPassword]=useState("");
+const arts=[
+"Musique",
+"Graffiti",
+"Dessin",
+"Peinture",
+"Photo",
+"Vidéo",
+"Montage vidéo",
+"Danse",
+"Chant",
+"Ecriture",
+"Poterie",
+"Cuisine",
+"Humour",
+"Maquillage",
+"Pilotage",
+"Mécanique",
+"Image synthèse",
+"Scrapbooking"
+]
 
-const [page,setPage]=useState("menu");
-
-useEffect(()=>{
-
-supabase.auth.getUser().then(({data})=>{
-setUser(data.user)
-})
-
-const {
-data:{subscription}
-}=supabase.auth.onAuthStateChange(
-(event,session)=>{
-setUser(session?.user||null)
-})
-
-return()=>subscription.unsubscribe()
-
-},[])
-
-async function connexion(){
-
-const {error}=await supabase.auth.signInWithPassword({
-email,
-password
-})
-
-if(error){
-alert(error.message)
-}
-
-}
-
-async function inscription(){
-
-const {error}=await supabase.auth.signUp({
-email,
-password
-})
-
-if(error){
-alert(error.message)
-}else{
-alert("Compte créé")
-}
-
-}
-
-async function logout(){
-
-await supabase.auth.signOut()
-
-}
+const jeux=Array(34).fill("?????")
 
 const btn={
-
 width:"100%",
 padding:"18px",
-marginBottom:15,
+marginBottom:"15px",
+borderRadius:"40px",
 border:"none",
-borderRadius:50,
-background:"#1cc7e8",
-cursor:"pointer",
-fontSize:18
+fontSize:"22px",
+cursor:"pointer"
 }
 
 const box={
 
-maxWidth:650,
-margin:"auto",
-padding:25,
-background:"#03152c",
-border:"2px solid cyan",
+background:"#02152e",
+padding:30,
 borderRadius:30,
+border:"2px solid cyan",
+maxWidth:900,
+margin:"auto",
+marginTop:30,
 color:"white"
-}
 
-if(!user){
+}
 
 return(
 
 <div style={{
 background:"#000814",
 minHeight:"100vh",
-padding:30,
-color:"white"
+padding:20,
+color:"white",
+fontFamily:"Arial"
 }}>
 
-<h1
-style={{
-color:"orange",
-textAlign:"center"
-}}
->
+<h1 style={{
+textAlign:"center",
+color:"#ffb300",
+fontSize:60
+}}>
 NOMAD GP
 </h1>
 
+<p style={{
+textAlign:"center",
+letterSpacing:10,
+color:"cyan"
+}}>
+Bienvenue pilote
+</p>
+
+{page==="menu"&&(
+
 <div style={box}>
 
-<h2>Connexion pilote</h2>
-
-<input
-placeholder="email"
-value={email}
-onChange={(e)=>setEmail(e.target.value)}
-style={btn}
-/>
-
-<input
-type="password"
-placeholder="mot de passe"
-value={password}
-onChange={(e)=>setPassword(e.target.value)}
-style={btn}
-/>
+<button
+style={{...btn,background:"#ffb300"}}
+onClick={()=>setPage("profil")}
+>
+👤 Profil
+</button>
 
 <button
-style={btn}
-onClick={connexion}
+style={{...btn,background:"#24c7e8"}}
+onClick={()=>setPage("garage")}
 >
-Connexion
+🚗 Garage NGP
 </button>
+
+<button
+style={{...btn,background:"#24c7e8"}}
+onClick={()=>setPage("parties")}
+>
+🏆 Parties
+</button>
+
+<button
+style={{...btn,background:"#24c7e8"}}
+onClick={()=>setPage("jeux")}
+>
+🎮 Jeux
+</button>
+
+<button
+style={{...btn,background:"#24c7e8"}}
+onClick={()=>setPage("arts")}
+>
+🎨 Arts Miniiizcar
+</button>
+
+<button
+style={{...btn,background:"#24c7e8"}}
+onClick={()=>setPage("team")}
+>
+🏗️ Team/Game Masters
+</button>
+
+</div>
+
+)}
+
+
+
+{page==="profil"&&(
+
+<div style={box}>
+
+<h2>👤 Profil pilote</h2>
+
+<p>
+Email caché aux autres joueurs ✅
+</p>
+
+<br/>
+
+Photo pilote
+
+<input type="file"/>
+
+<p>
+(stickers IA, filtres, effets bientôt)
+</p>
+
+<br/>
+
+Nom pilote officiel
+
+<input
+style={{width:"100%",padding:10}}
+defaultValue="Jean-Sèb"
+/>
+
+<br/><br/>
+
+Numéro pilote
+
+<input
+style={{width:"100%",padding:10}}
+defaultValue="34"
+/>
+
+<br/><br/>
+
+Nom pilote éphémère
+
+<textarea
+style={{
+width:"100%",
+height:70
+}}
+placeholder="pseudo secondaire"
+/>
+
+<br/><br/>
+
+Crew / équipe
+
+<input
+style={{width:"100%",padding:10}}
+placeholder="nom team"
+/>
+
+<br/><br/>
+
+<div style={{
+
+background:"#000",
+padding:25,
+fontSize:45,
+borderRadius:20,
+color:"cyan",
+textAlign:"center"
+
+}}>
+
+890 PTS
+
+</div>
+
+<br/>
 
 <button
 style={{
 ...btn,
 background:"orange"
 }}
-onClick={inscription}
+onClick={()=>setPage("menu")}
 >
-Créer compte
+
+Retour
+
 </button>
 
 </div>
 
-</div>
+)}
 
-)
 
-}
 
-return(
 
-<div style={{
-background:"#000814",
-minHeight:"100vh",
-padding:30,
-color:"white"
-}}>
-
-<h1
-style={{
-color:"orange",
-textAlign:"center"
-}}
->
-NOMAD GP
-</h1>
+{page==="garage"&&(
 
 <div style={box}>
 
-{page==="menu"&&<>
+<h2>🚗 Garage NGP</h2>
 
-<button style={btn} onClick={()=>setPage("profil")}>
-👤 Profil
-</button>
+<p>
 
-<button style={btn} onClick={()=>setPage("parties")}>
-🏆 Parties
-</button>
+Ajoute les photos de tes véhicules
 
-<button style={btn} onClick={()=>setPage("jeux")}>
-🎮 Jeux
-</button>
+</p>
 
-<button style={btn} onClick={()=>setPage("arts")}>
-🎨 Arts
-</button>
+<input type="file" multiple/>
 
-<button style={btn} onClick={()=>setPage("batisseurs")}>
-🏗️ Bâtisseurs
-</button>
+<br/><br/>
+
+<div style={{
+
+border:"2px dashed cyan",
+padding:50,
+textAlign:"center"
+
+}}>
+
+Galerie véhicules joueur
+
+</div>
+
+<p>
+
+Les autres joueurs pourront admirer les machines
+
+</p>
 
 <button
 style={{
 ...btn,
-background:"#ff4444"
+background:"orange"
 }}
-onClick={logout}
->
-Déconnexion
-</button>
-
-</>}
-
-{page==="profil"&&<>
-
-<h2>👤 Mon profil</h2>
-
-<p>Email : {user.email}</p>
-
-<p>Nom pilote officiel</p>
-
-<input
-style={btn}
-placeholder="Jean-Sèb"
-/>
-
-<p>Nom pilote éphémère</p>
-
-<input
-style={btn}
-placeholder="Pseudo secondaire"
-/>
-
-<p>Photo profil</p>
-
-<input
-type="file"
-/>
-
-<p>Compteur points : 0</p>
-
-<button
-style={btn}
 onClick={()=>setPage("menu")}
 >
+
 Retour
+
 </button>
-
-</>}
-
-{page==="parties"&&<>
-
-<h2>🏆 Historique</h2>
-
-<p>Aucune partie pour le moment</p>
-
-<button
-style={btn}
-onClick={()=>setPage("menu")}
->
-Retour
-</button>
-
-</>}
-
-{page==="jeux"&&<>
-
-<h2>🎮 Jeux Nomad GP</h2>
-
-<ul>
-
-<li>?????</li>
-<li>?????</li>
-<li>?????</li>
-
-</ul>
-
-<button
-style={btn}
-onClick={()=>setPage("menu")}
->
-Retour
-</button>
-
-</>}
-
-{page==="arts"&&<>
-
-<h2>🎨 Arts Miniiizcar</h2>
-
-<p>Musique : ❤️</p>
-<p>Graffiti : ?</p>
-<p>Montage vidéo : ON</p>
-
-<button
-style={btn}
-onClick={()=>setPage("menu")}
->
-Retour
-</button>
-
-</>}
-
-{page==="batisseurs"&&<>
-
-<h2>🏗️ Bâtisseurs</h2>
-
-<p>Contact équipe Nomad GP</p>
-
-<p>info.nomadgp@gmail.com</p>
-
-<button
-style={btn}
-onClick={()=>setPage("menu")}
->
-Retour
-</button>
-
-</>}
 
 </div>
+
+)}
+
+
+
+
+{page==="parties"&&(
+
+<div style={box}>
+
+<h2>
+🏆 Historique Parties
+</h2>
+
+<p>
+
+Historique vide
+
+</p>
+
+<p>
+
+Les nouveaux joueurs commencent sans partie
+
+</p>
+
+<p>
+
+Compte créateur = historique spécial
+
+</p>
+
+<button
+style={{
+...btn,
+background:"orange"
+}}
+onClick={()=>setPage("menu")}
+>
+
+Retour
+
+</button>
+
+</div>
+
+)}
+
+
+
+
+{page==="jeux"&&(
+
+<div style={box}>
+
+<h2>
+🎮 Jeux Nomad GP
+</h2>
+
+{jeux.map((jeu,index)=>(
+
+<div
+key={index}
+style={{
+
+padding:15,
+marginBottom:10,
+background:"#061f44",
+borderRadius:20
+
+}}
+>
+
+Jeu {index+1} : {jeu}
+
+</div>
+
+))}
+
+<button
+style={{
+...btn,
+background:"orange"
+}}
+onClick={()=>setPage("menu")}
+>
+
+Retour
+
+</button>
+
+</div>
+
+)}
+
+
+
+
+{page==="arts"&&(
+
+<div style={box}>
+
+<h2>
+🎨 Arts Miniiizcar
+</h2>
+
+{arts.map((art)=>(
+
+<div
+key={art}
+style={{
+
+padding:15,
+marginBottom:10,
+background:"#061f44",
+borderRadius:20
+
+}}
+>
+
+{art}
+
+<select
+style={{
+marginLeft:20
+}}
+>
+
+<option>
+ON
+</option>
+
+<option>
+OFF
+</option>
+
+<option>
+❤️
+</option>
+
+<option>
+?
+</option>
+
+</select>
+
+</div>
+
+))}
+
+<button
+style={{
+...btn,
+background:"orange"
+}}
+onClick={()=>setPage("menu")}
+>
+
+Retour
+
+</button>
+
+</div>
+
+)}
+
+
+
+
+
+{page==="team"&&(
+
+<div style={box}>
+
+<h2>
+
+🏗️ Team / Game Masters
+
+</h2>
+
+<h3>
+
+Contact équipe NGP
+
+</h3>
+
+info.nomadgp@gmail.com
+
+<br/><br/>
+
+<h3>
+
+Gestion Team
+
+</h3>
+
+Créer équipe
+
+<br/>
+
+Validation membres
+
+<br/>
+
+Demandes rejoindre équipe
+
+<br/><br/>
+
+<button
+style={{
+...btn,
+background:"orange"
+}}
+onClick={()=>setPage("menu")}
+>
+
+Retour
+
+</button>
+
+</div>
+
+)}
 
 </div>
 
